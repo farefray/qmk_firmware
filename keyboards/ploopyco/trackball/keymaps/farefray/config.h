@@ -18,22 +18,10 @@
 
 #pragma once
 
-#include "quantum.h"
-
-typedef union {
-    uint32_t raw;
-    struct {
-        uint8_t dpi_config;
-    };
-} keyboard_config_t;
-
-extern keyboard_config_t keyboard_config;
-extern uint16_t          dpi_array[];
-extern bool               is_drag_scroll;
-enum ploopy_keycodes {
-    DPI_CONFIG = QK_KB_0,
-    DRAG_SCROLL,
-};
-
-bool encoder_update_user(uint8_t index, bool clockwise);
-bool encoder_update_kb(uint8_t index, bool clockwise);
+// Define DPIs
+#define PLOOPY_DPI_OPTIONS { 400, 600, 800, 1000 }
+#define PLOOPY_DPI_DEFAULT 1
+#define PLOOPY_DRAGSCROLL_FIXED 1
+#define PLOOPY_DRAGSCROLL_INVERT 1
+#define PLOOPY_DRAGSCROLL_DPI 100  // Fixed-DPI Drag Scroll
+#define PLOOPY_DRAGSCROLL_DENOMINATOR 10

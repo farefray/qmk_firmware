@@ -58,13 +58,20 @@
 #    define ENCODER_BUTTON_COL 0
 #endif
 
+// custom code from: https://blog.slinkyworks.net/ploopy-classic/
+#ifndef PLOOPY_DRAGSCROLL_DENOMINATOR
+#    define PLOOPY_DRAGSCROLL_DENOMINATOR 10
+#endif
+static int _dragscroll_accumulator_x = 0;
+static int _dragscroll_accumulator_y = 0;
+
 keyboard_config_t keyboard_config;
 uint16_t          dpi_array[] = PLOOPY_DPI_OPTIONS;
 #define DPI_OPTION_SIZE ARRAY_SIZE(dpi_array)
 
 // Trackball State
 bool  is_scroll_clicked    = false;
-bool  is_drag_scroll       = false;
+bool is_drag_scroll = false;
 float scroll_accumulated_h = 0;
 float scroll_accumulated_v = 0;
 
@@ -134,16 +141,29 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
         scroll_accumulated_v += (float)mouse_report.y / PLOOPY_DRAGSCROLL_DIVISOR_V;
 
         // Assign integer parts of accumulated scroll values to the mouse report
-        mouse_report.h = (int8_t)scroll_accumulated_h;
+        _dragscroll_accumulator_x += mouse_report.x;
 #ifdef PLOOPY_DRAGSCROLL_INVERT
-        mouse_report.v = -(int8_t)scroll_accumulated_v;
+        _dragscroll_accumulator_y += -mouse_report.y;
 #else
-        mouse_report.v = (int8_t)scroll_accumulated_v;
+        _dragscroll_accumulator_y += mouse_report.y;
 #endif
 
         // Update accumulated scroll values by subtracting the integer parts
         scroll_accumulated_h -= (int8_t)scroll_accumulated_h;
         scroll_accumulated_v -= (int8_t)scroll_accumulated_v;
+
+        int div_x = _dragscroll_accumulator_x / PLOOPY_DRAGSCROLL_DENOMINATOR;
+        int div_y = _dragscroll_accumulator_y / PLOOPY_DRAGSCROLL_DENOMINATOR;
+
+        if (div_x != 0) {
+            mouse_report.h += div_x;
+            _dragscroll_accumulator_x -= div_x * PLOOPY_DRAGSCROLL_DENOMINATOR;
+        }
+
+        if (div_y != 0) {
+            mouse_report.v += div_y;
+            _dragscroll_accumulator_y -= div_y * PLOOPY_DRAGSCROLL_DENOMINATOR;
+        }
 
         // Clear the X and Y values of the mouse report
         mouse_report.x = 0;
