@@ -1,99 +1,109 @@
-/*
- * Copyright 2021 Quentin LEBASTARD <qlebastard@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include QMK_KEYBOARD_H
+#include "tap_dances.h"
 
-/*
- *MO(1) and MO(2) are represented as "MO(1)" and "MO(2)" respectively. These are momentary layer switch keys that activate Layer 1 and Layer 2 while held.
- *TRNS (transparent) keys are shown as "TRNS". These keys will use the function from the layer below.
- *QK_BOOT is the QMK bootloader key, used for flashing new firmware.
- *RGB_RM, RGB_TG, and RGB_MOD are for controlling RGB lighting (if your keyboard supports it).
- */
+enum custom_keycodes {
+    TOGGLE_LAYOUT = SAFE_RANGE,
+    BSPC_DEL,
+    ESC_CAPS,
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-/* Layer 0: Base Layer
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * | ESC  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  | Bksp |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | Tab  |   Q  |   W  |   E  |   R  |   T  |                    |   Y  |   U  |   I  |   O  |   P  |  -   |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |LShift|   A  |   S  |   D  |   F  |   G  |-------.    ,-------|   H  |   J  |   K  |   L  |   ;  |  '   |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * | LCtrl|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |  \   |
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |LCtrl | Space|MO(1) |/ MO(2) /       \ Enter\  |RGui |Home | Bksp | Del  | RAlt |
- *                   |      |      |      |/       /         \      \|     |     |      |      |      |
- *                   `----------------------------'           '------''-------------------------'
+/* Layer 0: Base Layer (Colemak-DH)
+ * ,-------------------------------------------.                              ,-------------------------------------------.
+ * |QK_GESC |   1  |   2  |   3  |   4  |   5  |                              |   6  |   7  |   8  |   9  |   0  |  +=    |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * |  TAB   |   Q  |   W  |   F  |   P  |   B  |                              |   J  |   L  |   U  |   Y  |      |   -_   |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * | TD(<[{)|   A  |   R  |   S  |   T  |   G  |                              |   M  |   N  |   E  |   I  |   O  | TD(>}])|
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * | LCTRL  |   Z  |   X  |   C  |   D  |   V  |                              |   K  |   H  |  '"  |  \|  |  /?  |   ;:   |
+ * `----------------------+------+------+------'                              `------+------+------+----------------------'
+ *                        |  .>  | LALT |MO(1) |                              |MO(1) | RGUI | ,<   |
+ *                        |      |      |      |                              |      |      |      |
+ *                        `--------------------'                              `--------------------'
+ *                                     |SPC/L |BCSPS/|                    |SHIFT/|   .  |
+ *                                     |SHIFT)|DEL   |                    |ENTER |      |
+ *                                     `-------------'                    `-------------'
  */
-    [0] = LAYOUT_split_4x6_5(KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_BSPC,
-                             //-------------------------------------------------//-----------------------------------------------------------//
-                             KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_MINS,
-                             //-------------------------------------------------//-----------------------------------------------------------//
-                             KC_LSFT, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT,
-                             //-------------------------------------------------//-----------------------------------------------------------//
-                             KC_LCTL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
-                             //-------------------------------------------------//-----------------------------------------------------------//
-                             KC_LCTL, KC_SPC, MO(1), MO(2), KC_ENT, KC_RGUI, KC_HOME, KC_BSPC, KC_DEL, KC_RALT),
+    [0] = LAYOUT_split_4x6_5(
+        QK_GESC,KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                       KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,
+        KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                       KC_J,    KC_L,    KC_U,    KC_Y,    _______, KC_MINS,
+        TD(TD_LBRC), KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                       KC_M,    KC_N,    KC_E,    KC_I,    KC_O,    TD(TD_RBRC),
+        KC_LCTL, KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                       KC_K,    KC_H,    KC_QUOTE, KC_SLSH, KC_BSLS, KC_SEMICOLON,
+        KC_DOT, KC_LALT, MO(1), MO(1), KC_RGUI, KC_COMMA, KC_BSPC, LSFT_T(KC_SPACE), RSFT_T(KC_ENT), _______
+    ),
 
-/* Layer 1: Symbol and Numpad Layer
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * |  ~   |   !  |   @  |   #  |   $  |   %  |                    |   ^  |   &  |   *  |   (  |   )  | Del  |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |QK_BOOT|      |      |      |      |   [  |                    |   ]  |   7  |   8  |   9  |      |  +   |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | Home |PgUp  |PgDn  | End  |   (  |-------.    ,-------|   )  |   4  |   5  |   6  |   -  |  |   |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------|    |-------|      |   1  |   2  |   3  |   =  |  _   |
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |LCtrl | Home |TRNS  |/ TRNS  /       \ RAlt \  |RGui |Space| Bksp |RCtrl| Enter|
- *                   |      |      |      |/       /         \      \|     |     |      |     |      |
- *                   `----------------------------'           '------''-------------------------'
+/* Layer 1: Function, Navigation, and IDE shortcuts Layer
+ * ,-------------------------------------------.                              ,-------------------------------------------.
+ * |  F12   |  F1  |  F2  |  F3  |  F4  |  F5  |                              |  F6  |  F7  |  F8  |  F9  | F10  |  F11   |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * |        | UNDO | CUT  | COPY |PASTE |      |                              | PGUP | HOME |  UP  | END  |      |        |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * |        | LCTR | LALT | LGUI |LSHFT |      |                              | PGDN | LEFT | DOWN |RIGHT |      |        |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * |        |      |      |      |      |      |                              | MUTE | VOL- | VOL+ |BRIG- |BRIG+ |QK_BOOT |
+ * `----------------------+------+------+------'                              `------+------+------+----------------------'
+ *                        |      |      | TRNS |                              | TRNS |      |      |
+ *                        |      |      |      |                              |      |      |      |
+ *                        `--------------------'                              `----------------------'
+ *                                              ,-------------.  ,-------------.
+ *                                              | TRNS |      |  |      | TRNS |
+ *                                              |      |      |  |      |      |
+ *                                              `-------------'  `-------------'
  */
-    [1] = LAYOUT_split_4x6_5(KC_TILD, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,
-                             //---------------------------------------------------------//-----------------------------------------------------------//
-                             QK_BOOT, _______, _______, _______, _______, KC_LBRC, KC_RBRC, KC_P7, KC_P8, KC_P9, _______, KC_PLUS,
-                             //---------------------------------------------------------//-----------------------------------------------------------//
-                             _______, KC_HOME, KC_PGUP, KC_PGDN, KC_END, KC_LPRN, KC_RPRN, KC_P4, KC_P5, KC_P6, KC_MINS, KC_PIPE,
-                             //---------------------------------------------------------//-----------------------------------------------------------//
-                             _______, _______, _______, _______, _______, _______, _______, KC_P1, KC_P2, KC_P3, KC_EQL, KC_UNDS,
-                             //---------------------------------------------------------//-----------------------------------------------------------//
-                             KC_LCTL, KC_HOME, KC_TRNS, KC_TRNS, KC_RALT, KC_RGUI, KC_SPC, KC_BSPC, KC_RCTL, KC_ENT),
+    [1] = LAYOUT_split_4x6_5(
+        KC_F12,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                      KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
+        _______, KC_UNDO, KC_CUT,  KC_COPY, KC_PASTE,_______,                    KC_PGUP, KC_HOME, KC_UP,   KC_END,  _______, _______,
+        _______, KC_LCTL, KC_LALT, KC_LGUI, KC_LSFT, _______,                    KC_PGDN, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______,
+        _______, _______, _______, _______, _______, _______,                    KC_MUTE, KC_VOLD, KC_VOLU, KC_BRID, KC_BRIU, QK_BOOT,
+                          _______, _______, _______, KC_TRNS, _______,           _______, KC_TRNS, _______, _______, _______
+    ),
 
-/* Layer 2: Function and Media Layer
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * | F12  |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |RGB_RM|RGB_TG|RGB_MD|   [  |                    |   ]  |      | NUM  | INS  |SCRL |MUTE |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | Left |  Up  | Down |Right |   (  |-------.    ,-------|   )  | Prev | Play | Next |      | Vol+ |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------|    |-------|      |      |      |      |      | Vol- |
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |LCtrl | Home |TRNS  |/ TRNS  /       \ RAlt \  |QK_BOOT|Space| Bksp |RCtrl| Enter|
- *                   |      |      |      |/       /         \      \|     |     |      |     |      |
- *                   `----------------------------'           '------''-------------------------'
+/* Layer 2: QWERTY Layout for Ukrainian
  */
-    [2] = LAYOUT_split_4x6_5(KC_F12, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11,
-                             //---------------------------------------------------------//--------------------------------------------------------------//
-                             _______, _______, RGB_RMOD, RGB_TOG, RGB_MOD, KC_LBRC, KC_RBRC, _______, KC_NUM, KC_INS, KC_SCRL, KC_MUTE,
-                             //---------------------------------------------------------//--------------------------------------------------------------//
-                             _______, KC_LEFT, KC_UP, KC_DOWN, KC_RGHT, KC_LPRN, KC_RPRN, KC_MPRV, KC_MPLY, KC_MNXT, _______, KC_VOLU,
-                             //---------------------------------------------------------//--------------------------------------------------------------//
-                             _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_VOLD,
-                             //---------------------------------------------------------//--------------------------------------------------------------//
-                             KC_LCTL, KC_HOME, KC_TRNS, KC_TRNS, KC_RALT, QK_BOOT, KC_SPC, KC_BSPC, KC_RCTL, KC_ENT),
+    [2] = LAYOUT_split_4x6_5(
+        _______, _______, _______, _______, _______, _______,                    _______, _______, _______, _______, _______, _______,
+        _______, KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                       KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    _______,
+        _______, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                       KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+        _______, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                       KC_N,    KC_M,    KC_COMM, KC_DOT,  _______, _______,
+                          _______, _______, _______, _______, _______,           _______, _______, _______, _______, _______
+    ),
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+  switch (keycode) {
+    case KC_BSPC: {
+      static uint16_t registered_key = KC_NO;
+      if (record->event.pressed) {  // On key press.
+        const uint8_t mods = get_mods();
+#ifndef NO_ACTION_ONESHOT
+        uint8_t shift_mods = (mods | get_oneshot_mods()) & MOD_MASK_SHIFT;
+#else
+        uint8_t shift_mods = mods & MOD_MASK_SHIFT;
+#endif  // NO_ACTION_ONESHOT
+        if (shift_mods) {  // At least one shift key is held.
+          registered_key = KC_DEL;
+          // If one shift is held, clear it from the mods. But if both
+          // shifts are held, leave as is to send Shift + Del.
+          if (shift_mods != MOD_MASK_SHIFT) {
+#ifndef NO_ACTION_ONESHOT
+            del_oneshot_mods(MOD_MASK_SHIFT);
+#endif  // NO_ACTION_ONESHOT
+            unregister_mods(MOD_MASK_SHIFT);
+          }
+        } else {
+          registered_key = KC_BSPC;
+        }
+
+        register_code(registered_key);
+        set_mods(mods);
+      } else {  // On key release.
+        unregister_code(registered_key);
+      }
+    } return false;
+
+    // Other macros...
+  }
+
+  return true;
+}
